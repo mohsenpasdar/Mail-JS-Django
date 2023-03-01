@@ -1,3 +1,33 @@
 textarea {
     min-height: 400px;
 }
+
+.emails-container {
+    margin: 0;
+    padding: 0;
+}
+
+.email-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 0px;
+    margin-bottom: 2px;
+    /* add margin-bottom to create space between email boxes */
+}
+
+.email-box span {
+    /* add display block to create spacing between sender, subject, and timestamp */
+    margin-bottom: 5px;
+}
+
+.email-box .sender {
+    font-weight: bold;
+}
+
+.email-box .subject {
+    color: #666;
+}
+
+.email-box .timestamp {
+    color: #999;
+}

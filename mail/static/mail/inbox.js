@@ -68,11 +68,53 @@ function compose_email() {
 }
 
 function load_mailbox(mailbox) {
-
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  // Request emails for the specified mailbox
+  fetch(`/emails/${mailbox}`)
+    .then(response => response.json())
+    .then(emails => {
+      // Create a container for the emails
+      const emailsContainer = document.createElement('div');
+      emailsContainer.classList.add('emails-container');
+
+
+      // Render each email
+      emails.forEach(email => {
+        // Create a container for the email box
+        const emailBox = document.createElement('div');
+        emailBox.classList.add('email-box');
+
+        // Set the background color based on the read status of the email
+        if (email.read) {
+          emailBox.style.backgroundColor = '#f2f2f2';
+        } else {
+          emailBox.style.backgroundColor = 'white';
+        }
+
+        // Add the sender, subject, and timestamp to the email box
+        const sender = document.createElement('span');
+        sender.innerHTML = email.sender;
+        const subject = document.createElement('span');
+        subject.innerHTML = email.subject;
+        const timestamp = document.createElement('span');
+        timestamp.innerHTML = email.timestamp;
+
+        // Add the sender, subject, and timestamp to the email box
+        emailBox.appendChild(sender);
+        emailBox.appendChild(subject);
+        emailBox.appendChild(timestamp);
+
+        // Add the email box to the emails container
+        emailsContainer.appendChild(emailBox);
+      });
+
+      // Add the emails container to the emails view
+      document.querySelector('#emails-view').appendChild(emailsContainer);
+    });
 }
