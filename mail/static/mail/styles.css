@@ -18,16 +18,18 @@ textarea {
 .email-box span {
     /* add display block to create spacing between sender, subject, and timestamp */
     margin-bottom: 5px;
+    margin-right: 10px;
 }
 
-.email-box .sender {
-    font-weight: bold;
+.sender {
+    margin-right: 10px;
 }
 
-.email-box .subject {
-    color: #666;
+.subject {
+    margin-left: 30px;
 }
 
-.email-box .timestamp {
-    color: #999;
+.timestamp {
+    margin-left: 10px;
+    float: right;
 }

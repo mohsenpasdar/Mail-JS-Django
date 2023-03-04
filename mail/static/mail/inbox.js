@@ -90,8 +90,10 @@ function load_mailbox(mailbox) {
         const emailBox = document.createElement('div');
         emailBox.classList.add('email-box');
 
-        // Set the background color based on the read status of the email
-        if (email.read) {
+        // Set the background color based on the mailbox and read status of the email
+        if (mailbox === "sent") {
+          emailBox.style.backgroundColor = '#f2f2f2';
+        } else if (email.read) {
           emailBox.style.backgroundColor = '#f2f2f2';
         } else {
           emailBox.style.backgroundColor = 'white';
@@ -101,14 +103,23 @@ function load_mailbox(mailbox) {
         const sender = document.createElement('span');
         sender.innerHTML = email.sender;
         const subject = document.createElement('span');
+        subject.classList.add('subject')
         subject.innerHTML = email.subject;
         const timestamp = document.createElement('span');
+        timestamp.classList.add('timestamp')
         timestamp.innerHTML = email.timestamp;
 
         // Add the sender, subject, and timestamp to the email box
         emailBox.appendChild(sender);
         emailBox.appendChild(subject);
         emailBox.appendChild(timestamp);
+
+        // Add the font-weight style to the sender span for unread emails in the inbox
+        if (mailbox === "inbox" && !email.read) {
+          sender.style.fontWeight = "bold";
+          subject.style.fontWeight = "bold";
+          timestamp.style.fontWeight = "bold";
+        }
 
         // Add the email box to the emails container
         emailsContainer.appendChild(emailBox);
