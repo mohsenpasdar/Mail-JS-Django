@@ -91,8 +91,7 @@ function load_mailbox(mailbox) {
         // Create a container for the email box
         const emailBox = document.createElement('div');
         emailBox.addEventListener('click', () => {
-          console.log(email);
-          view_email(email.id);
+          view_email(email.id, mailbox);
         })
         emailBox.classList.add('email-box');
 
@@ -107,6 +106,7 @@ function load_mailbox(mailbox) {
 
         // Add the sender, subject, and timestamp to the email box
         const sender = document.createElement('span');
+        sender.classList.add('sender')
         sender.innerHTML = email.sender;
         const subject = document.createElement('span');
         subject.classList.add('subject')
@@ -136,7 +136,7 @@ function load_mailbox(mailbox) {
     });
 }
 
-function view_email(email_id) {
+function view_email(email_id, mailbox) {
   // Hide the emails view and show the email view
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
@@ -153,21 +153,38 @@ function view_email(email_id) {
         <p><strong>To:</strong> ${email.recipients.join(', ')}</p>
         <p><strong>Subject:</strong> ${email.subject}</p>
         <p><strong>Timestamp:</strong> ${email.timestamp}</p>
+        ${mailbox !== 'sent' ? `<button class="btn btn-sm btn-outline-primary archive">${email.archived ? 'Unarchive' : 'Archive'}</button>` : ''}
         <hr>
         <p>${email.body}</p>
       `;
-
-      // Mark the email as read
+      // Add an event listener to the archive button
+      const archiveBtn = emailView.querySelector('.archive');
+      if (archiveBtn) {
+        archiveBtn.addEventListener('click', () => {
+          const newState = !email.archived;
+          fetch(`/emails/${email.id}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+              archived: newState
+            })
+          })
+            .then(() => {
+              email.archived = newState;
+              archiveBtn.textContent = newState ? 'Unarchive' : 'Archive';
+              load_mailbox('inbox');
+            })
+            .catch(error => console.error(error));
+        });
+      }
+      // Mark email as read if it is unread
       if (!email.read) {
-        fetch(`/emails/${email_id}`, {
+        fetch(`/emails/${email.id}`, {
           method: 'PUT',
           body: JSON.stringify({
             read: true
           })
-        });
+        }).catch(error => console.error(error));
       }
     })
-    .catch(error => {
-      console.error(error);
-    });
+    .catch(error => console.error(error));
 }
