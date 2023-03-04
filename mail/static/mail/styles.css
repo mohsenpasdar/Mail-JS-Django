@@ -1,5 +1,6 @@
 textarea {
-    min-height: 400px;
+    min-height: 300px;
+
 }
 
 .emails-container {
@@ -40,4 +41,8 @@ textarea {
 .timestamp {
     flex-basis: 30%;
     margin-left: auto;
+}
+
+.submitBtn {
+    margin-top: 5px;
 }

@@ -44,6 +44,8 @@ function send_email(recipients, subject, body) {
         throw new Error('At least one recipient required.');
       } else if (response.status === 400) {
         throw new Error('User with email ' + recipients + ' does not exist.');
+      } else {
+        throw new Error('Failed to send email.');
       }
     })
     .then(data => {
@@ -146,6 +148,7 @@ function view_email(email_id, mailbox) {
   fetch(`/emails/${email_id}`)
     .then(response => response.json())
     .then(email => {
+      console.log(email);
       // Display the email content in the email view
       const emailView = document.querySelector('#email-view');
       emailView.innerHTML = `
@@ -156,7 +159,9 @@ function view_email(email_id, mailbox) {
         ${mailbox !== 'sent' ? `<button class="btn btn-sm btn-outline-primary archive">${email.archived ? 'Unarchive' : 'Archive'}</button>` : ''}
         <hr>
         <p>${email.body}</p>
+        ${mailbox !== 'sent' ? `<button class="btn btn-sm btn-outline-primary reply">Reply</button>` : "" }
       `;
+      
       // Add an event listener to the archive button
       const archiveBtn = emailView.querySelector('.archive');
       if (archiveBtn) {
@@ -176,6 +181,29 @@ function view_email(email_id, mailbox) {
             .catch(error => console.error(error));
         });
       }
+
+      // Add an event listener to the reply button
+      const replyBtn = emailView.querySelector('.reply');
+      if (replyBtn) {
+        replyBtn.addEventListener('click', () => {
+          compose_email();
+          const composeRecipients = document.querySelector('#compose-recipients');
+          const composeSubject = document.querySelector('#compose-subject');
+          const composeBody = document.querySelector('#compose-body');
+          // pre-fill the composition form with the recipient field set to whoever sent the original email
+          composeRecipients.value = email.sender;
+          // pre-fill the subject line
+          const rePrefix = email.subject.toLowerCase().startsWith('re:');
+          composeSubject.value = rePrefix ? email.subject : `Re: ${email.subject}`;
+          // pre-fill the body of the email with a line like "On Jan 1 2020, 12:00 AM foo@example.com wrote:"
+          composeBody.value = `\nOn ${email.timestamp} ${email.sender} wrote:\n${email.body}\n`;
+          // set cursor at the beginning of composeBody field
+          composeBody.focus();
+          composeBody.selectionStart = 0;
+          composeBody.selectionEnd = 0;
+        });
+      }
+
       // Mark email as read if it is unread
       if (!email.read) {
         fetch(`/emails/${email.id}`, {
