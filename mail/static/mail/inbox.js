@@ -58,6 +58,7 @@ function send_email(recipients, subject, body) {
 function compose_email() {
 
   // Show compose view and hide other views
+  document.querySelector('#email-view').style.display = 'none';
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
 
@@ -70,6 +71,7 @@ function compose_email() {
 function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
+  document.querySelector('#email-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
 
   // Show the mailbox name
@@ -88,6 +90,10 @@ function load_mailbox(mailbox) {
       emails.forEach(email => {
         // Create a container for the email box
         const emailBox = document.createElement('div');
+        emailBox.addEventListener('click', () => {
+          console.log(email);
+          view_email(email.id);
+        })
         emailBox.classList.add('email-box');
 
         // Set the background color based on the mailbox and read status of the email
@@ -127,5 +133,41 @@ function load_mailbox(mailbox) {
 
       // Add the emails container to the emails view
       document.querySelector('#emails-view').appendChild(emailsContainer);
+    });
+}
+
+function view_email(email_id) {
+  // Hide the emails view and show the email view
+  document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#email-view').style.display = 'block';
+
+  // Make a GET request to /emails/<email_id> to retrieve the email content
+  fetch(`/emails/${email_id}`)
+    .then(response => response.json())
+    .then(email => {
+      // Display the email content in the email view
+      const emailView = document.querySelector('#email-view');
+      emailView.innerHTML = `
+        <p><strong>From:</strong> ${email.sender}</p>
+        <p><strong>To:</strong> ${email.recipients.join(', ')}</p>
+        <p><strong>Subject:</strong> ${email.subject}</p>
+        <p><strong>Timestamp:</strong> ${email.timestamp}</p>
+        <hr>
+        <p>${email.body}</p>
+      `;
+
+      // Mark the email as read
+      if (!email.read) {
+        fetch(`/emails/${email_id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            read: true
+          })
+        });
+      }
+    })
+    .catch(error => {
+      console.error(error);
     });
 }

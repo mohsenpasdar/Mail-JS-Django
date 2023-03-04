@@ -15,6 +15,10 @@ textarea {
     /* add margin-bottom to create space between email boxes */
 }
 
+.email-box:hover {
+    cursor: pointer;
+}
+
 .email-box span {
     /* add display block to create spacing between sender, subject, and timestamp */
     margin-bottom: 5px;
